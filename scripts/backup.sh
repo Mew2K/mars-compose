@@ -1,0 +1,1 @@
+docker run --rm -v mars-api-compose_mars-api -v $(pwd):/backup busybox tar -cvzf "/backup/backup-$(date +%Y-%m-%d_%H-%M).tar" /data

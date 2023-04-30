@@ -1,0 +1,96 @@
+version: "3"
+
+services:
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    command: ["redis-server", "/etc/redis/redis.conf"]
+    volumes:
+      - mars-api:/data
+      - ./config/redis/redis.conf:/etc/redis/redis.conf
+    expose:
+      - "6379"
+    networks:
+      - api
+  mongo:
+    image: mongo:latest
+    restart: unless-stopped
+    volumes:
+      - mars-api:/data/db
+    ports:
+      - "27017"
+    networks:
+      - api
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME
+      - MONGO_INITDB_ROOT_PASSWORD
+  # api:
+  #   image: ghcr.io/warzone/mars-api:master
+  #   hostname: api01
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - "redis"
+  #     - "mongo"
+  #   networks:
+  #     - api
+  #     - web
+  #   ports:
+  #     - "3000"
+  #   environment:
+  #     - MARS_API_TOKEN
+  #     - MARS_CONFIG_PATH=./config/config.properties
+  #     - MARS_BROADCASTS_PATH=./config/broadcasts.yml
+  #     - MARS_LEVEL_COLORS_PATH=./config/level_colors.yml
+  #     - MARS_PUNTYPES_PATH=./config/puntypes.yml
+  #     - MARS_JOIN_SOUNDS_PATH=./config/join_sounds.yml
+  #   volumes:
+  #     - ./config/api:/usr/mars-api/config
+  api:
+    user: ${UID_GID}
+    image: ghcr.io/chatasma/mars-api-rs:master
+    hostname: api01
+    restart: unless-stopped
+    depends_on:
+      - "redis"
+      - "mongo"
+    networks:
+      - api
+    ports:
+      - "7000"
+      - "8000:8000"
+    environment:
+      - MARS_API_TOKEN
+      - MARS_CONFIG_PATH=./config/config.properties
+      - MARS_BROADCASTS_PATH=./config/broadcasts.yml
+      - MARS_LEVEL_COLORS_PATH=./config/level_colors.yml
+      - MARS_PUNTYPES_PATH=./config/puntypes.yml
+      - MARS_JOIN_SOUNDS_PATH=./config/join_sounds.yml
+    volumes:
+      - ./config/api:/app/bin/config
+    working_dir: /app/bin
+  mcsrv:
+    # user: ${UID_GID}
+    build:
+      context: ./images
+      dockerfile: mcsrv.Dockerfile
+    image: sportpaper:1.0
+    ports:
+      - "25565:25565"
+    container_name: mcserver
+    stdin_open: true
+    tty: true
+    volumes:
+      - "./server:/app/server"
+      - "./config/mars:/app/server/plugins/Mars"
+    depends_on:
+      - api
+    networks:
+      - api
+
+volumes:
+  mars-api:
+
+networks:
+  api:
+  web:
+    driver: bridge
