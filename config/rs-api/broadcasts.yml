@@ -1,0 +1,10 @@
+- name: demo
+  message: &6This is a broadcast!
+
+- name: secret
+  message: This is an exclusive message.
+  permission: pgm.donor
+
+- name: odd
+  message: The other messages are wrapped with newlines, but this?
+  newline: false
