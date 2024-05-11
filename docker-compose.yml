@@ -1,0 +1,106 @@
+services:
+  mars_compile:
+    container_name: "mars_compile"
+    user: "${UID_GID}"
+    build:
+      context: ./images
+      dockerfile: compile_mars.Dockerfile
+    volumes:
+      - type: bind
+        source: ./mars
+        target: /workspace/mars
+    stdin_open: true
+    tty: true
+  api_compile:
+    container_name: "api_compile"
+    user: "${UID_GID}"
+    build:
+      context: ./images
+      dockerfile: compile_api.Dockerfile
+    volumes:
+      - type: bind
+        source: ./api
+        target: /workspace/api
+  redis:
+    container_name: "redis"
+    image: redis:latest
+    command: ["redis-server", "/etc/redis/redis.conf"]
+    volumes:
+      - mars-api:/data
+      - ./config/redis/redis.conf:/etc/redis/redis.conf
+    expose:
+      - "6379"
+    networks:
+      - api
+  mongo:
+    container_name: "mongo"
+    image: mongo:latest
+    volumes:
+      - mars-api:/data/db
+    ports:
+      - "27017"
+    networks:
+      - api
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER:-mongoadmin}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS:-secret}
+  api:
+    container_name: "api"
+    build:
+      context: ./images
+      dockerfile: api.Dockerfile
+    depends_on:
+      - "redis"
+      - "mongo"
+    networks:
+      - api
+    ports:
+      - "7000"
+      - "8000:8000"
+    environment:
+      - MARS_API_TOKEN=${MARS_API_TOKEN:-sampleauthtoken}
+      - MARS_CONFIG_PATH=./config/config.properties
+      - MARS_BROADCASTS_PATH=./config/broadcasts.yml
+      - MARS_LEVEL_COLORS_PATH=./config/level_colors.yml
+      - MARS_PUNTYPES_PATH=./config/puntypes.yml
+      - MARS_JOIN_SOUNDS_PATH=./config/join_sounds.yml
+    volumes:
+      - ./api:/workspace/api
+      - ./config/api:/workspace/config
+    stdin_open: true
+    tty: true
+  mcsrv:
+    container_name: "mcsrv"
+    user: "${UID_GID}"
+    ports:
+      - "25565:25565"
+    build:
+      context: ./images
+      dockerfile: mcsrv.Dockerfile
+    stdin_open: true
+    tty: true
+    volumes:
+      - type: bind
+        source: ./mars
+        target: /workspace/mars
+      - type: bind
+        source: ./api
+        target: /workspace/api
+      - type: bind
+        source: ./server
+        target: /workspace/server
+      - type: bind
+        source: ./config/mars
+        target: /workspace/config
+    depends_on:
+      - api
+    networks:
+      - api
+
+volumes:
+  mars-api:
+
+networks:
+  api:
+  # web:
+  #   driver: bridge
