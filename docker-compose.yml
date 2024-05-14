@@ -1,26 +1,26 @@
 services:
   mars_compile:
     container_name: "mars_compile"
-    user: "${UID_GID}"
     build:
       context: ./images
       dockerfile: compile_mars.Dockerfile
     volumes:
       - type: bind
         source: ./mars
-        target: /workspace/mars
+        target: C:/workspace/mars
     stdin_open: true
     tty: true
+
   api_compile:
     container_name: "api_compile"
-    user: "${UID_GID}"
     build:
       context: ./images
       dockerfile: compile_api.Dockerfile
     volumes:
       - type: bind
         source: ./api
-        target: /workspace/api
+        target: C:/workspace/api
+
   redis:
     container_name: "redis"
     image: redis:latest
@@ -32,18 +32,20 @@ services:
       - "6379"
     networks:
       - api
+
   mongo:
     container_name: "mongo"
     image: mongo:latest
     volumes:
       - mars-api:/data/db
     ports:
-      - "27017"
+      - "27017:27017"
     networks:
       - api
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER:-mongoadmin}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASS:-secret}
+
   api:
     container_name: "api"
     build:
@@ -55,7 +57,7 @@ services:
     networks:
       - api
     ports:
-      - "7000"
+      - "7000:7000"
       - "8000:8000"
     environment:
       - MARS_API_TOKEN=${MARS_API_TOKEN:-sampleauthtoken}
@@ -69,9 +71,9 @@ services:
       - ./config/api:/workspace/config
     stdin_open: true
     tty: true
+
   mcsrv:
     container_name: "mcsrv"
-    user: "${UID_GID}"
     ports:
       - "25565:25565"
     build:
@@ -82,16 +84,16 @@ services:
     volumes:
       - type: bind
         source: ./mars
-        target: /workspace/mars
+        target: C:/workspace/mars
       - type: bind
         source: ./api
-        target: /workspace/api
+        target: C:/workspace/api
       - type: bind
         source: ./server
-        target: /workspace/server
+        target: C:/workspace/server
       - type: bind
         source: ./config/mars
-        target: /workspace/config
+        target: C:/workspace/config
     depends_on:
       - api
     networks:
@@ -102,5 +104,3 @@ volumes:
 
 networks:
   api:
-  # web:
-  #   driver: bridge

@@ -1,5 +1,4 @@
-FROM rust:latest
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
 WORKDIR /workspace
-COPY compile_api.sh /workspace/compile_api.sh
-RUN chmod +x /workspace/compile_api.sh
-CMD ["/usr/bin/env", "bash", "/workspace/compile_api.sh"]
+COPY compile_api.ps1 /workspace/compile_api.ps1
+CMD ["powershell.exe", "-File", "/workspace/compile_api.ps1"]

@@ -1,5 +1,4 @@
-FROM ubuntu:noble
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
 WORKDIR /workspace
-COPY api.sh /workspace/api.sh
-RUN chmod +x /workspace/api.sh
-ENTRYPOINT ["/usr/bin/env", "bash", "/workspace/api.sh"]
+COPY api.ps1 /workspace/api.ps1
+ENTRYPOINT ["powershell.exe", "-File", "/workspace/api.ps1"]
