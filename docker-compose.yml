@@ -1,7 +1,6 @@
 services:
   mars_compile:
     container_name: "mars_compile"
-    user: "${UID_GID}"
     build:
       context: ./images
       dockerfile: compile_mars.Dockerfile
@@ -13,7 +12,6 @@ services:
     tty: true
   api_compile:
     container_name: "api_compile"
-    user: "${UID_GID}"
     build:
       context: ./images
       dockerfile: compile_api.Dockerfile
@@ -71,7 +69,6 @@ services:
     tty: true
   mcsrv:
     container_name: "mcsrv"
-    user: "${UID_GID}"
     ports:
       - "25565:25565"
     build:
