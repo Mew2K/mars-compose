@@ -19,7 +19,7 @@ This setup is not intended for production environments. Use only for development
 - Startup:
 
 ```sh
-./scripts/up.sh
+./scripts/up.ps1
 ```
 
 * Compiles the Rust API and plugin
@@ -35,7 +35,7 @@ This setup is not intended for production environments. Use only for development
 - Teardown (not including Gradle daemon):
 
 ```sh
-./scripts/down.sh
+./scripts/down.ps1
 ```
 
 * `/stop`s the server if running
@@ -49,7 +49,7 @@ As the plugin source and API source are checked out to the `./mars` and `./api` 
 - Killing plugin Gradle daemon:
 
 ```sh
-./scripts/mars_compile_daemon_kill.sh
+./scripts/mars_compile_daemon_kill.ps1
 ```
 
 * Stops and removes the plugin compilation container
