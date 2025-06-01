@@ -15,3 +15,5 @@ function takedown-container-completely {
 }
 
 takedown-container-completely "mars_compile"
+
+Read-Host -Prompt "Press Enter to exit"

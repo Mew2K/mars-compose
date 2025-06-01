@@ -1,11 +1,22 @@
 #!/usr/bin/env bash
+
+echo "[compile_mars.sh] Starting Mars compilation script"
+
 if [ ! -d "mars/.git" ]; then
+    echo "MARS GIT NOT FOUND. CLONING!!!"
     git clone https://github.com/Warzone/mars.git mars
-    cd mars
-    git checkout -b pgm-0.16 origin/pgm-0.16
-    # no achievements on the Rust API, checkout a commit without them
-    git checkout 3c1ea9f275a5129fada75a697d50aeefc6340fe9
-    cd ..
 fi
+
 cd mars
+
+sed -i 's/\r$//' gradlew
+
+java -version
+
+echo "Compiling..."
+
+
+# ./gradlew clean build --no-daemon
 ./gradlew --console=plain shadowJar
+
+# exec /bin/sh

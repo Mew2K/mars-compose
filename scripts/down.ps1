@@ -1,24 +1,12 @@
-function container-is-running {
-    param($containerName)
-    $container = docker ps -a | Select-String $containerName
-    if (!$container) {
-        return 0
-    }
-    $running = docker container inspect -f '{{.State.Running}}' $containerName
-    if ($running -eq "true") {
-        return 1
-    } else {
-        return 0
-    }
-}
+. "$PSScriptRoot\common_utils.ps1"
 
 # Send stop to the MC server
 $mcsrvContainer = "mcsrv"
-if ((container-is-running $mcsrvContainer) -eq 1) {
+if ((ContainerIsRunning $mcsrvContainer) -eq 1) {
     echo "stop" | docker attach $mcsrvContainer
     Start-Sleep -Seconds 1
     # if it didn't exit kill it
-    if ((container-is-running $mcsrvContainer) -eq 1) {
+    if ((ContainerIsRunning $mcsrvContainer) -eq 1) {
         docker kill $mcsrvContainer
     }
 }
@@ -51,6 +39,8 @@ $apiCompileContainer = "api_compile"
 if (docker ps -aq -f name=^$apiCompileContainer$) {
     docker rm $apiCompileContainer
 }
+
+Read-Host -Prompt "Press Enter to exit"
 
 # Exit clean to disregard last status
 exit 0

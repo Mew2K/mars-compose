@@ -8,6 +8,16 @@ foreach ($dir in $dirs) {
     }
 }
 
+# Clone Mars repo on host if needed
+if (-Not (Test-Path "mars\.git")) {
+    git clone https://github.com/Warzone/mars.git mars
+}
+
+# Clone Mars API repo on host if needed
+if (-Not (Test-Path "api\.git")) {
+    git clone https://github.com/Warzone/mars-api-rs.git api
+}
+
 # Start the compilation tasks in the background
 Start-Process "docker-compose" -ArgumentList "up", "api_compile", "mars_compile", "-d", "--build" -NoNewWindow -Wait
 
@@ -37,3 +47,5 @@ if (-Not (Test-Path "api\target")) {
 
 # Start the MC server, API, Redis, DB
 Start-Process "docker-compose" -ArgumentList "up", "-d", "mcsrv" -NoNewWindow -Wait
+
+Read-Host -Prompt "Press Enter to exit"
