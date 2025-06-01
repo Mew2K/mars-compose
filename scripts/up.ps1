@@ -1,5 +1,7 @@
 # Ensure Docker is set to Windows containers (manually ensure this before running the script)
 
+$env:UID_GID = "1000:1000"
+
 # Set up directories
 $dirs = @("mars", "api", "server")
 foreach ($dir in $dirs) {
